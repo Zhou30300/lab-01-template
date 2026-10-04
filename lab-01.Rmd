@@ -78,7 +78,7 @@ visitors %>% arrange(desc(n_2022))
 _What are the top 10 most visited attractions in 2021?_
 ```{r Ex_c}
 visitors %>% 
-  arrange(desc(n-2021)) %>%
+  arrange(desc(n_2021)) %>%
   head(n =10)
 ```
 
@@ -132,8 +132,9 @@ _How many attractions had between 50,000 and 100,000 visitors in 2022?_
 visitors %>% 
   filter(
    n_2022<=100000,
-    n_2022>=50000) %>%
-  count()
+    n_2022>=50000) |>
+   count()
+
 ```
 
 ### Exercise g.
@@ -170,8 +171,8 @@ _Perform the same calculation for the 2021 admissions data._
 ```{r Ex_h}
 visitors %>% 
   summarise(
-    mean_2021=mean(n_2021),
-    med_2021=median(n_2021)
+    mean_2021=mean(n_2021,na.rm=TRUE),
+    med_2021=median(n_2021,na.rm=TRUE)
   )
 ```
 
@@ -183,7 +184,7 @@ _What does `NA` stand for and why are you getting this as your answer to the pre
 
 **Write your answer here**
 
-  there are some value missing in this data
+  there are some values that are missing in this data.
 
 
 ### Exercise j.
@@ -222,8 +223,8 @@ there are more big value than the small value in this data.
 ```{r Q8}
 visitors %>% 
   summarise(
-    min_2021=mins(n_2021),
-     max_2021=max(n_2021),
+    min_2021=min(n_2021,na.rm=TRUE),
+     max_2021=max(n_2021,na.rm=TRUE),
   )
 ```
 
@@ -255,8 +256,12 @@ _How many tourist attractions are there in each of the 4 nations? From this, dis
 
 
 ```{r Ex_l}
-#________ %>%
-#  ______(_______)
+visitors%>%
+  count(nation = case_when(
+      region == "Northern Ireland" ~ "Northern Ireland",
+      region == "Scotland" ~ "Scotland",
+      region == "Wales" ~ "Wales",
+      TRUE ~ "England"))
 ```
 
 
@@ -269,7 +274,15 @@ _Within each of the 4 nations, what is the proportion of tourist attractions tha
 
 ```{r Ex_m}
 # Write your code here
-
+visitors_with_nations|>
+  group_by(nation = case_when(
+      region == "Northern Ireland" ~ "Northern Ireland",
+      region == "Scotland" ~ "Scotland",
+      region == "Wales" ~ "Wales",
+      TRUE ~ "England"))|>
+  summarise(
+    proportion_free=mean(admission=="Free",na.rm=TRUE)
+  )
 
 ```
 
@@ -280,7 +293,15 @@ _Calculate the percentage change in visitor admissions from 2021 to 2022. Of the
 
 ```{r Ex_n}
 # Write your code here
-
+visitors_with_nations%>%
+  mutate(pct_change=((n_2022-n_2021)/n_2021*100)
+         )%>%
+    filter(nation=="Scotland")%>%
+  group_by(admission)%>%
+  summarise(
+    mean_pct_change=mean(pct_change,na.rm=TRUE
+  ))%>%
+    arrange(mean_pct_change)
 
 
 ```
